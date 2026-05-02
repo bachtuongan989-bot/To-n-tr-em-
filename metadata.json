@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Remix: Math Buddy - Học Toán Vui Vẻ",
+  "description": "Ứng dụng học toán thông minh cho trẻ từ 1-15 tuổi, tích hợp giải toán, minh họa sinh động và bài hát công thức.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
