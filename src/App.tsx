@@ -31,6 +31,7 @@ import { PracticeSection } from './components/PracticeSection';
 import { MathGames } from './components/MathGames';
 import { ClockLesson } from './components/ClockLesson';
 import { ClockPractice } from './components/ClockPractice';
+import { CalendarLesson } from './components/CalendarLesson';
 import { WelcomeSection } from './components/WelcomeSection';
 import { OperationPractice } from './components/OperationPractice';
 import { MockExam } from './components/MockExam';
@@ -45,7 +46,7 @@ function cn(...inputs: ClassValue[]) {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'intro' | 'table' | 'practice' | 'clock' | 'fun' | 'operations' | 'exam'>('intro');
-  const [clockMode, setClockMode] = useState<'lesson' | 'practice'>('lesson');
+  const [clockMode, setClockMode] = useState<'lesson' | 'practice' | 'calendar'>('lesson');
   const [age, setAge] = useState(7);
   const [selectedTopic, setSelectedTopic] = useState('general');
   const [loading, setLoading] = useState(false);
@@ -363,7 +364,7 @@ export default function App() {
             >
               <div className="text-center space-y-4 mb-8 md:mb-12">
                 <h2 className="font-display text-3xl md:text-5xl text-gray-800">
-                  {clockMode === 'lesson' ? 'Học Xem Giờ Thật Dễ' : 'Thử Thách Xem Giờ'}
+                  {clockMode === 'lesson' ? 'Học Xem Giờ Thật Dễ' : clockMode === 'practice' ? 'Thử Thách Xem Giờ' : 'Học Xem Lịch'}
                 </h2>
                 <div className="flex justify-center gap-4 mt-6">
                   <button 
@@ -384,10 +385,21 @@ export default function App() {
                   >
                     Luyện Tập
                   </button>
+                  {age >= 7 && age <= 8 && (
+                    <button 
+                      onClick={() => setClockMode('calendar')}
+                      className={cn(
+                        "px-6 py-2 rounded-xl font-bold transition-all",
+                        clockMode === 'calendar' ? "bg-purple-500 text-white shadow-lg" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      )}
+                    >
+                      Xem Lịch
+                    </button>
+                  )}
                 </div>
               </div>
               
-              {clockMode === 'lesson' ? <ClockLesson /> : <ClockPractice />}
+              {clockMode === 'lesson' ? <ClockLesson /> : clockMode === 'practice' ? <ClockPractice /> : <CalendarLesson />}
             </motion.div>
           )}
 

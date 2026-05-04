@@ -18,335 +18,209 @@ export interface Exam {
   timeLimit: number; // in seconds
 }
 
-export const ExamService = {
-  getExamsByAge(age: number, difficulty: 'medium' | 'hard' = 'medium'): Exam[] {
-    const grade = Math.max(1, age - 5);
-    
-    if (age <= 8) {
-      return [
-        {
-          id: 'exam-g2-01',
-          title: 'Đề Kiểm Tra Định Kỳ - Lớp 2',
-          grade: 2,
-          difficulty: 'easy',
-          timeLimit: 900, // 15 minutes
-          questions: [
-            {
-              id: 'g2q1',
-              type: 'multiple-choice',
-              text: 'Số liền trước của số 80 là:',
-              options: [
-                { value: 'A', label: '70' }, { value: 'B', label: '81' }, 
-                { value: 'C', label: '79' }, { value: 'D', label: '82' }
-              ],
-              correctAnswer: 'C',
-              points: 1
-            },
-            {
-              id: 'g2q2',
-              type: 'multiple-choice',
-              text: 'Số gồm 5 chục và 2 đơn vị là:',
-              options: [
-                { value: 'A', label: '502' }, { value: 'B', label: '552' }, 
-                { value: 'C', label: '25' }, { value: 'D', label: '52' }
-              ],
-              correctAnswer: 'D',
-              points: 1
-            },
-            {
-              id: 'g2q3',
-              type: 'multiple-choice',
-              text: 'Số tám mươi tư viết là:',
-              options: [
-                { value: 'A', label: '48' }, { value: 'B', label: '804' }, 
-                { value: 'C', label: '84' }, { value: 'D', label: '448' }
-              ],
-              correctAnswer: 'C',
-              points: 1
-            },
-            {
-              id: 'g2q4',
-              type: 'multiple-choice',
-              text: 'Điền dấu thích hợp vào chỗ chấm: 8 + 5 …. 15',
-              options: [
-                { value: 'A', label: '>' }, { value: 'B', label: '<' }, 
-                { value: 'C', label: '=' }, { value: 'D', label: 'Khác' }
-              ],
-              correctAnswer: 'B',
-              points: 1
-            },
-            {
-              id: 'g2q5',
-              type: 'multiple-choice',
-              text: 'Lan có 7 cái kẹo, Mai có 8 cái kẹo. Cả hai bạn có …. cái kẹo?',
-              options: [
-                { value: 'A', label: '14 cái' }, { value: 'B', label: '13 cái' }, 
-                { value: 'C', label: '15 cái' }, { value: 'D', label: '12 cái' }
-              ],
-              correctAnswer: 'C',
-              points: 1
-            },
-            {
-              id: 'g2q6',
-              type: 'multiple-choice',
-              text: 'Số lớn nhất có hai chữ số khác nhau là:',
-              options: [
-                { value: 'A', label: '99' }, { value: 'B', label: '89' }, 
-                { value: 'C', label: '98' }, { value: 'D', label: '90' }
-              ],
-              correctAnswer: 'C',
-              points: 1
-            },
-            {
-              id: 'g2q7',
-              type: 'text',
-              text: 'Tính kết quả: 31 + 7 = ?',
-              correctAnswer: '38',
-              points: 1
-            },
-            {
-              id: 'g2q8',
-              type: 'text',
-              text: 'Tính kết quả: 78 - 50 = ?',
-              correctAnswer: '28',
-              points: 1
-            },
-            {
-              id: 'g2q9',
-              type: 'text',
-              text: 'Lớp 2A có 35 học sinh, lớp 2B có nhiều hơn lớp 2A là 3 học sinh. Hỏi lớp 2B có bao nhiêu học sinh? (Chỉ ghi số)',
-              correctAnswer: '38',
-              points: 1
-            },
-            {
-              id: 'g2q10',
-              type: 'multiple-choice',
-              text: 'Hình tam giác có bao nhiêu cạnh?',
-              options: [
-                { value: 'A', label: '2' }, { value: 'B', label: '3' }, 
-                { value: 'C', label: '4' }, { value: 'D', label: '5' }
-              ],
-              correctAnswer: 'B',
-              points: 1
-            }
-          ]
-        }
-      ];
-    } else {
-      // Age 9-15
-      if (difficulty === 'hard') {
-        return [
-          {
-            id: 'exam-hard-01',
-            title: 'Đề Khảo Sát Học Sinh Giỏi',
-            grade: Math.min(9, grade),
-            difficulty: 'hard',
-            timeLimit: 1200, // 20 minutes
-            questions: [
-              {
-                id: 'hq1',
-                type: 'multiple-choice',
-                text: 'Tìm x biết: (x + 1) + (x + 2) + ... + (x + 10) = 75',
-                options: [
-                  { value: 'A', label: '2' }, { value: 'B', label: '3' }, 
-                  { value: 'C', label: '4' }, { value: 'D', label: '5' }
-                ],
-                correctAnswer: 'A',
-                points: 2
-              },
-              {
-                id: 'hq2',
-                type: 'multiple-choice',
-                text: 'Một hình vuông có chu vi 20cm. Nếu gấp cạnh hình vuông lên 3 lần thì diện tích thay đổi thế nào?',
-                options: [
-                  { value: 'A', label: 'Gấp 3 lần' }, { value: 'B', label: 'Gấp 6 lần' }, 
-                  { value: 'C', label: 'Gấp 9 lần' }, { value: 'D', label: 'Gấp 12 lần' }
-                ],
-                correctAnswer: 'C',
-                points: 2
-              },
-              {
-                id: 'hq3',
-                type: 'text',
-                text: 'Tổng của hai số là 100, hiệu của hai số là 20. Số lớn là bao nhiêu?',
-                correctAnswer: '60',
-                points: 2
-              },
-              {
-                id: 'hq4',
-                type: 'multiple-choice',
-                text: 'Trong các số sau, số nào vừa chia hết cho 2, vừa chia hết cho 5, vừa chia hết cho 9?',
-                options: [
-                  { value: 'A', label: '90' }, { value: 'B', label: '100' }, 
-                  { value: 'C', label: '180' }, { value: 'D', label: 'Cả A và C' }
-                ],
-                correctAnswer: 'D',
-                points: 2
-              },
-              {
-                id: 'hq5',
-                type: 'text',
-                text: 'Một vòi nước chảy vào bể không có nước, mỗi giờ được 1/4 bể. Hỏi sau bao lâu thì bể đầy nước? (Ghi số giờ)',
-                correctAnswer: '4',
-                points: 2
-              },
-              {
-                id: 'hq6',
-                type: 'multiple-choice',
-                text: 'Nếu tăng chiều dài hình chữ nhật thêm 20%, giảm chiều rộng đi 20% thì diện tích thay đổi thế nào?',
-                options: [
-                  { value: 'A', label: 'Không đổi' }, { value: 'B', label: 'Giảm 4%' }, 
-                  { value: 'C', label: 'Tăng 4%' }, { value: 'D', label: 'Giảm 2%' }
-                ],
-                correctAnswer: 'B',
-                points: 2
-              },
-              {
-                id: 'hq7',
-                type: 'text',
-                text: 'Có 5 người làm xong một công việc trong 10 ngày. Hỏi muốn làm xong công việc đó trong 2 ngày thì cần bao nhiêu người? (Sức làm như nhau)',
-                correctAnswer: '25',
-                points: 2
-              },
-              {
-                id: 'hq8',
-                type: 'multiple-choice',
-                text: 'Diện tích hình tròn có bán kính 2cm là (lấy pi = 3.14):',
-                options: [
-                  { value: 'A', label: '12.56 cm²' }, { value: 'B', label: '6.28 cm²' }, 
-                  { value: 'C', label: '15.7 cm²' }, { value: 'D', label: '3.14 cm²' }
-                ],
-                correctAnswer: 'A',
-                points: 2
-              },
-              {
-                id: 'hq9',
-                type: 'text',
-                text: 'Tìm một số biết rằng 2/5 của số đó bằng 20.',
-                correctAnswer: '50',
-                points: 2
-              },
-              {
-                id: 'hq10',
-                type: 'multiple-choice',
-                text: 'Một đội công nhân có 15 người. Dự định làm xong đoạn đường trong 20 ngày. Nếu muốn làm xong sớm 10 ngày thì cần thêm bao nhiêu người?',
-                options: [
-                  { value: 'A', label: '15 người' }, { value: 'B', label: '30 người' }, 
-                  { value: 'C', label: '10 người' }, { value: 'D', label: '5 người' }
-                ],
-                correctAnswer: 'A',
-                points: 2
-              }
-            ]
-          }
-        ];
-      } else {
-        return [
-          {
-            id: 'exam-med-01',
-            title: 'Đề Ôn Tập Tổng Hợp',
-            grade: Math.min(9, grade),
-            difficulty: 'medium',
-            timeLimit: 1200, // 20 minutes
-            questions: [
-              {
-                id: 'advq1',
-                type: 'multiple-choice',
-                text: 'Giá trị của biểu thức 25 x 4 + 150 : 5 là:',
-                options: [
-                  { value: 'A', label: '130' }, { value: 'B', label: '150' }, 
-                  { value: 'C', label: '120' }, { value: 'D', label: '180' }
-                ],
-                correctAnswer: 'A',
-                points: 1
-              },
-              {
-                id: 'advq2',
-                type: 'multiple-choice',
-                text: 'Một hình chữ nhật có chiều dài 12cm, chiều rộng bằng 1/3 chiều dài. Diện tích hình đó là:',
-                options: [
-                  { value: 'A', label: '36 cm²' }, { value: 'B', label: '48 cm²' }, 
-                  { value: 'C', label: '40 cm²' }, { value: 'D', label: '144 cm²' }
-                ],
-                correctAnswer: 'B',
-                points: 1
-              },
-              {
-                id: 'advq3',
-                type: 'multiple-choice',
-                text: 'Tìm x biết: x : 4 = 25 (dư 3)',
-                options: [
-                  { value: 'A', label: '100' }, { value: 'B', label: '103' }, 
-                  { value: 'C', label: '97' }, { value: 'D', label: '108' }
-                ],
-                correctAnswer: 'B',
-                points: 1
-              },
-              {
-                id: 'advq4',
-                type: 'text',
-                text: 'Trung bình cộng của 3 số: 15, 25 và 50 là bao nhiêu?',
-                correctAnswer: '30',
-                points: 1
-              },
-              {
-                id: 'advq5',
-                type: 'multiple-choice',
-                text: 'Đổi 2m² 5dm² sang dm² ta được:',
-                options: [
-                  { value: 'A', label: '25' }, { value: 'B', label: '205' }, 
-                  { value: 'C', label: '250' }, { value: 'D', label: '2005' }
-                ],
-                correctAnswer: 'B',
-                points: 1
-              },
-              {
-                id: 'advq6',
-                type: 'text',
-                text: 'Một người đi bộ trong 3 giờ được 12km. Hỏi trong 5 giờ người đó đi được bao nhiêu km? (Vận tốc không đổi)',
-                correctAnswer: '20',
-                points: 1
-              },
-              {
-                id: 'advq7',
-                type: 'multiple-choice',
-                text: 'Phân số nào lớn nhất trong các phân số sau: 1/2, 2/3, 3/4, 4/5?',
-                options: [
-                  { value: 'A', label: '1/2' }, { value: 'B', label: '2/3' }, 
-                  { value: 'C', label: '3/4' }, { value: 'D', label: '4/5' }
-                ],
-                correctAnswer: 'D',
-                points: 1
-              },
-              {
-                id: 'advq8',
-                type: 'multiple-choice',
-                text: 'Số nào chia hết cho cả 2, 3 và 5?',
-                options: [
-                  { value: 'A', label: '15' }, { value: 'B', label: '20' }, 
-                  { value: 'C', label: '30' }, { value: 'D', label: '45' }
-                ],
-                correctAnswer: 'C',
-                points: 1
-              },
-              {
-                id: 'advq9',
-                type: 'text',
-                text: 'Diện tích một hình vuông là 64 cm². Chu vi hình vuông đó là bao nhiêu cm?',
-                correctAnswer: '32',
-                points: 2
-              },
-              {
-                id: 'advq10',
-                type: 'text',
-                text: 'Một cửa hàng có 100kg gạo. Ngày đầu bán 1/4 số gạo, ngày thứ hai bán 1/5 số gạo còn lại. Hỏi sau hai ngày cửa hàng còn bao nhiêu kg gạo?',
-                correctAnswer: '60',
-                points: 2
-              }
-            ]
-          }
-        ];
-      }
+function randInt(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function shuffle<T>(array: T[]): T[] {
+  const newArr = [...array];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
+function generateOptions(correctAnswer: number, isText: boolean = false): { value: string; label: string }[] | undefined {
+  if (isText) return undefined;
+  let falseOuts = new Set<number>();
+  while(falseOuts.size < 3) {
+    let offset = randInt(-5, 5);
+    if(offset === 0) continue;
+    let wrong = correctAnswer + offset;
+    if(wrong >= 0) falseOuts.add(wrong);
+  }
+  let opts = [{ value: 'A', label: '' }, { value: 'B', label: '' }, { value: 'C', label: '' }, { value: 'D', label: '' }];
+  let values = shuffle([correctAnswer, ...Array.from(falseOuts)]);
+  return opts.map((opt, idx) => ({ ...opt, label: values[idx].toString() }));
+}
+
+function getCorrectOption(options: { value: string; label: string }[] | undefined, correctAnswer: number): string {
+  if (!options) return correctAnswer.toString();
+  const opt = options.find(o => o.label === correctAnswer.toString());
+  return opt ? opt.value : 'A';
+}
+
+function generateGrade2Question(diff: string, index: number): Question {
+  const isHard = diff === 'hard';
+  const typeR = randInt(1, 5);
+  let text = '';
+  let correct = 0;
+  
+  if (typeR === 1) {
+    const a = randInt(isHard ? 50 : 10, isHard ? 100 : 50);
+    text = `Số liền ${randInt(0, 1) === 0 ? 'trước' : 'sau'} của số ${a} là:`;
+    correct = text.includes('trước') ? a - 1 : a + 1;
+  } else if (typeR === 2) {
+    const a = randInt(1, 9);
+    const b = randInt(0, 9);
+    text = `Số gồm ${a} chục và ${b} đơn vị là:`;
+    correct = a * 10 + b;
+  } else if (typeR === 3) {
+    const a = randInt(10, isHard ? 90 : 50);
+    const b = randInt(5, isHard ? 50 : 20);
+    text = `Tính kết quả: ${a} + ${b} = ?`;
+    correct = a + b;
+  } else if (typeR === 4) {
+    const a = randInt(isHard ? 50 : 20, isHard ? 100 : 50);
+    const b = randInt(5, a - 5);
+    text = `Tính kết quả: ${a} - ${b} = ?`;
+    correct = a - b;
+  } else {
+    const a = randInt(isHard ? 20 : 10, isHard ? 50 : 30);
+    const b = randInt(2, isHard ? 10 : 5);
+    text = `Lớp 2A có ${a} học sinh, lớp 2B nhiều hơn 2A là ${b} học sinh. Hỏi lớp 2B có bao nhiêu học sinh?`;
+    correct = a + b;
+  }
+  
+  const isText = randInt(0, 1) === 0;
+  const options = generateOptions(correct, isText);
+  
+  return {
+    id: `g2q-${Date.now()}-${index}`,
+    type: isText ? 'text' : 'multiple-choice',
+    text,
+    options,
+    correctAnswer: getCorrectOption(options, correct),
+    points: isHard ? 2 : 1
+  };
+}
+
+function generateGrade3Question(diff: string, index: number): Question {
+  const isHard = diff === 'hard';
+  const typeR = randInt(1, 5);
+  let text = '';
+  let correct = 0;
+  
+  if (typeR === 1) {
+    const a = randInt(isHard ? 10 : 2, isHard ? 20 : 9);
+    const b = randInt(isHard ? 10 : 2, isHard ? 20 : 9);
+    text = `Giá trị của phép tính: ${a} x ${b} là:`;
+    correct = a * b;
+  } else if (typeR === 2) {
+    const b = randInt(2, 9);
+    const res = randInt(3, isHard ? 20 : 10);
+    const a = res * b;
+    text = `Tìm x biết: x : ${b} = ${res}`;
+    correct = a;
+  } else if (typeR === 3) {
+    const a = randInt(20, 100) * 10;
+    const b = randInt(10, 50) * 10;
+    text = `Tính: ${a} + ${b} = ?`;
+    correct = a + b;
+  } else if (typeR === 4) {
+    const a = randInt(isHard ? 50 : 10, 100);
+    const b = randInt(2, 9);
+    text = `Chu vi hình vuông có cạnh ${a}cm là:`;
+    correct = a * 4;
+  } else {
+    const a = randInt(isHard ? 500 : 100, isHard ? 900 : 500);
+    const b = randInt(isHard ? 100 : 50, a - 10);
+    text = `Tính: ${a} - ${b} = ?`;
+    correct = a - b;
+  }
+
+  const isText = randInt(0, 1) === 0;
+  const options = generateOptions(correct, isText);
+  
+  return {
+    id: `g3q-${Date.now()}-${index}`,
+    type: isText ? 'text' : 'multiple-choice',
+    text,
+    options,
+    correctAnswer: getCorrectOption(options, correct),
+    points: isHard ? 2 : 1
+  };
+}
+
+function generateGrade4PlusQuestion(diff: string, index: number): Question {
+  const isHard = diff === 'hard';
+  const typeR = randInt(1, 5);
+  let text = '';
+  let correct = 0;
+  
+  if (typeR === 1) {
+    const a = randInt(10, 50);
+    const b = randInt(5, 20);
+    const c = randInt(2, 10);
+    text = `Tính: ${a} x ${b} + ${c} = ?`;
+    correct = a * b + c;
+  } else if (typeR === 2) {
+    const a = randInt(20, 100);
+    const b = randInt(5, 20);
+    text = `Diện tích hình chữ nhật có chiều dài ${a}cm, chiều rộng ${b}cm là:`;
+    correct = a * b;
+  } else if (typeR === 3) {
+    const a = randInt(5, 20);
+    const b = randInt(10, 30);
+    const c = randInt(15, 40);
+    text = `Trung bình cộng của 3 số: ${a}, ${b} và ${c} là:`;
+    correct = (a + b + c) / 3;
+    // ensure integer
+    if ((a+b+c)%3 !== 0) {
+        text = `Tính: ${a} + ${b} + ${c} = ?`;
+        correct = a + b + c;
     }
+  } else if (typeR === 4) {
+    const a = randInt(isHard ? 100 : 50, 500);
+    const b = randInt(isHard ? 20 : 5, 50);
+    text = `Một cửa hàng có ${a}kg gạo. Đã bán đi ${b}kg. Còn lại bao nhiêu kg gạo?`;
+    correct = a - b;
+  } else {
+    const a = randInt(5, 15);
+    text = `Tìm diện tích hình vuông có chu vi là ${a * 4}cm.`;
+    correct = a * a;
+  }
+
+  const isText = randInt(0, 1) === 0;
+  const options = generateOptions(correct, isText);
+  
+  return {
+    id: `g4q-${Date.now()}-${index}`,
+    type: isText ? 'text' : 'multiple-choice',
+    text,
+    options,
+    correctAnswer: getCorrectOption(options, correct),
+    points: isHard ? 2 : 1
+  };
+}
+
+export const ExamService = {
+  getExamsByAge(age: number, difficulty: 'medium' | 'hard' = 'medium', length: 10 | 15 = 10): Exam[] {
+    const grade = Math.max(1, age - 5);
+    const examQuestions: Question[] = [];
+    
+    for (let i = 0; i < length; i++) {
+        if (age <= 7) {
+            examQuestions.push(generateGrade2Question(difficulty, i));
+        } else if (age === 8) {
+            examQuestions.push(generateGrade3Question(difficulty, i));
+        } else {
+            examQuestions.push(generateGrade4PlusQuestion(difficulty, i));
+        }
+    }
+
+    const timeLimit = length === 10 ? 900 : 1800; // 15 mins for 10q, 30 mins for 15q
+
+    return [
+      {
+        id: `exam-dynamic-${Date.now()}`,
+        title: `Đề Luyện Tập Lớp ${grade}`,
+        grade,
+        difficulty,
+        timeLimit: difficulty === 'hard' ? timeLimit + 300 : timeLimit,
+        questions: examQuestions
+      }
+    ];
   }
 };

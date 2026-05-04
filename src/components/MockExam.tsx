@@ -22,7 +22,8 @@ interface MockExamProps {
 
 export const MockExam: React.FC<MockExamProps> = ({ age }) => {
   const [difficulty, setDifficulty] = useState<'medium' | 'hard'>('medium');
-  const [exams, setExams] = useState<Exam[]>(() => ExamService.getExamsByAge(age, difficulty));
+  const [examLength, setExamLength] = useState<10 | 15>(10);
+  const [exams, setExams] = useState<Exam[]>(() => ExamService.getExamsByAge(age, difficulty, examLength));
   const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
@@ -31,11 +32,11 @@ export const MockExam: React.FC<MockExamProps> = ({ age }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const QUESTIONS_PER_PAGE = 4;
+  const QUESTIONS_PER_PAGE = 5;
 
   useEffect(() => {
-    setExams(ExamService.getExamsByAge(age, difficulty));
-  }, [age, difficulty]);
+    setExams(ExamService.getExamsByAge(age, difficulty, examLength));
+  }, [age, difficulty, examLength]);
 
   useEffect(() => {
     if (selectedExam && !isFinished) {
@@ -102,15 +103,13 @@ export const MockExam: React.FC<MockExamProps> = ({ age }) => {
           <p className="text-gray-500 text-lg">Hệ thống đề thi chuẩn lớp {Math.max(1, age - 5)}</p>
         </div>
 
-        {age >= 9 && (
-          <div className="flex justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <div className="flex bg-gray-100 p-1 rounded-2xl">
             <button
               onClick={() => setDifficulty('medium')}
               className={cn(
-                "px-6 py-3 rounded-2xl font-bold transition-all",
-                difficulty === 'medium' 
-                  ? "bg-math-secondary text-white shadow-lg" 
-                  : "bg-white text-gray-400 border-2 border-gray-100"
+                "px-6 py-2 rounded-xl font-bold transition-all",
+                difficulty === 'medium' ? "bg-white text-math-secondary shadow-sm" : "text-gray-400"
               )}
             >
               Mức độ Vừa
@@ -118,16 +117,34 @@ export const MockExam: React.FC<MockExamProps> = ({ age }) => {
             <button
               onClick={() => setDifficulty('hard')}
               className={cn(
-                "px-6 py-3 rounded-2xl font-bold transition-all",
-                difficulty === 'hard' 
-                  ? "bg-math-primary text-white shadow-lg" 
-                  : "bg-white text-gray-400 border-2 border-gray-100"
+                "px-6 py-2 rounded-xl font-bold transition-all",
+                difficulty === 'hard' ? "bg-white text-math-primary shadow-sm" : "text-gray-400"
               )}
             >
               Mức độ Khó
             </button>
           </div>
-        )}
+          <div className="flex bg-gray-100 p-1 rounded-2xl">
+            <button
+              onClick={() => setExamLength(10)}
+              className={cn(
+                "px-6 py-2 rounded-xl font-bold transition-all",
+                examLength === 10 ? "bg-white text-blue-500 shadow-sm" : "text-gray-400"
+              )}
+            >
+              10 Câu hỏi
+            </button>
+            <button
+              onClick={() => setExamLength(15)}
+              className={cn(
+                "px-6 py-2 rounded-xl font-bold transition-all",
+                examLength === 15 ? "bg-white text-blue-500 shadow-sm" : "text-gray-400"
+              )}
+            >
+              15 Câu hỏi
+            </button>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {exams.map((exam) => (
