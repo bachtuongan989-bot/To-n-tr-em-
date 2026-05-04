@@ -40,8 +40,8 @@ export const MathGames: React.FC<MathGamesProps> = ({ age = 7 }) => {
   }, [age]);
   
   // Custom Settings
-  const [selectedOps, setSelectedOps] = useState<string[]>(age >= 9 ? ['*', '/', '+', '-'] : ['+', '-']);
-  const [maxRange, setMaxRange] = useState(age >= 9 ? 50 : 20);
+  const [selectedOps, setSelectedOps] = useState<string[]>(age >= 8 ? ['*', '/', '+', '-'] : ['+', '-']);
+  const [maxRange, setMaxRange] = useState(age >= 8 ? 50 : 20);
   
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);

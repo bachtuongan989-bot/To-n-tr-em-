@@ -142,12 +142,7 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    // Hide clock if age >= 8
-    if (age >= 8 && activeTab === 'clock') {
-      setActiveTab('intro');
-    }
-  }, [age, activeTab]);
+
 
   return (
     <div className="min-h-screen font-sans selection:bg-math-primary/30">
@@ -179,11 +174,11 @@ export default function App() {
             {[
               { id: 'operations', label: 'Cộng Trừ', icon: Plus },
               { id: 'table', label: 'Nhân Chia', icon: BookOpen },
-              { id: 'clock', label: 'Xem Giờ', icon: Clock, hidden: age >= 8 },
+              { id: 'clock', label: 'Xem Giờ', icon: Clock },
               { id: 'exam', label: 'Luyện Đề', icon: ClipboardList },
               { id: 'practice', label: 'Luyện Tập', icon: GraduationCap },
               { id: 'fun', label: 'Game Vui', icon: Sparkles },
-            ].filter((t: any) => !t.hidden).map((tab: any) => (
+            ].map((tab: any) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -208,7 +203,7 @@ export default function App() {
                 onChange={(e) => setAge(parseInt(e.target.value))}
                 className="font-bold text-sm md:text-base text-math-secondary bg-transparent outline-none cursor-pointer appearance-none pr-4"
               >
-                {[...Array(9)].map((_, i) => {
+                {[...Array(4)].map((_, i) => {
                   const val = i + 7;
                   return <option key={val} value={val}>{val} Tuổi</option>;
                 })}
@@ -411,11 +406,11 @@ export default function App() {
         {[
           { id: 'operations', label: 'Tính Nhẩm', icon: Plus },
           { id: 'table', label: 'Nhân Chia', icon: BookOpen },
-          { id: 'clock', label: 'Xem Giờ', icon: Clock, hidden: age >= 8 },
+          { id: 'clock', label: 'Xem Giờ', icon: Clock },
           { id: 'exam', label: 'Luyện Đề', icon: ClipboardList },
           { id: 'practice', label: 'Luyện Tập', icon: GraduationCap },
           { id: 'fun', label: 'Game Vui', icon: Sparkles },
-        ].filter((t: any) => !t.hidden).map((tab: any) => (
+        ].map((tab: any) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}

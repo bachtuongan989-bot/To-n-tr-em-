@@ -120,15 +120,13 @@ export const WelcomeSection: React.FC<WelcomeSectionProps & { age?: number }> = 
             description="Làm chủ bảng cửu chương nháy mắt bằng các mẹo ghi nhớ cực hay và các bài ôn tập vui vẻ."
             onClick={() => onStart('table')}
           />
-          {age < 8 && (
-            <FeatureCard 
-              icon={Clock}
-              color="bg-math-secondary"
-              title="Học Xem Đồng Hồ"
-              description="Bé sẽ biết cách nhìn giờ, phút và làm quen với thời gian qua mô hình đồng hồ thực tế."
-              onClick={() => onStart('clock')}
-            />
-          )}
+          <FeatureCard 
+            icon={Clock}
+            color="bg-math-secondary"
+            title="Học Xem Đồng Hồ"
+            description="Bé sẽ biết cách nhìn giờ, phút và làm quen với thời gian qua mô hình đồng hồ thực tế."
+            onClick={() => onStart('clock')}
+          />
           <FeatureCard 
             icon={ClipboardList}
             color="bg-orange-500"
