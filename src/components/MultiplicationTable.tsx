@@ -40,9 +40,20 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
   const [quizScore, setQuizScore] = useState(0);
   const [quizCount, setQuizCount] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(10);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const numbers = age >= 10 ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] : [2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const tableRows = age >= 10 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const numbers = age >= 9 ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] : [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const [tableRows, setTableRows] = useState<number[]>([]);
+
+  useEffect(() => {
+    const baseRows = age >= 9 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    if (age >= 9 && mode === 'learn') {
+      setTableRows([...baseRows].sort(() => Math.random() - 0.5));
+    } else {
+      setTableRows(baseRows);
+    }
+  }, [age, mode, selectedNum, tableType]);
 
   useEffect(() => {
     if (mode === 'learn') {
@@ -64,14 +75,32 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
   };
 
   const generateQuizQuestion = () => {
-    const range = age >= 10 ? 19 : 9;
+    const range = age >= 9 ? 19 : 9;
     const offset = 2;
     const a = quizType === 'specific' ? selectedNum : Math.floor(Math.random() * range) + offset;
-    const b = age >= 10 ? Math.floor(Math.random() * 12) + 1 : Math.floor(Math.random() * 10) + 1;
+    const b = age >= 9 ? Math.floor(Math.random() * 12) + 1 : Math.floor(Math.random() * 10) + 1;
     setQuizQuestion({ a, b });
     setQuizInput('');
     setQuizFeedback(null);
+    if (age >= 9) setTimeLeft(10);
   };
+
+  useEffect(() => {
+    if (mode === 'quiz' && !quizFinished && quizQuestion && age >= 9) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((t) => {
+          if (t <= 1) {
+            handleQuizSubmit(new Event('submit') as any);
+            return 10;
+          }
+          return t - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [mode, quizFinished, quizQuestion, age]);
 
   const handleInputChange = (i: number, value: string) => {
     const newAnswers = { ...userAnswers, [i]: value };
@@ -102,6 +131,8 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
     const correctAns = quizQuestion.a * quizQuestion.b;
     const isCorrect = parseInt(quizInput) === correctAns;
     
+    if (timerRef.current) clearInterval(timerRef.current);
+
     if (isCorrect) {
       setQuizFeedback('correct');
       setQuizScore(prev => prev + 1);
@@ -167,20 +198,22 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
           )}
         >
           <Calculator className="w-5 h-5" />
-          Học Bảng
+          {age >= 9 ? 'Luyện Tính' : 'Học Bảng'}
         </button>
-        <button
-          onClick={() => setMode('matrix')}
-          className={cn(
-            "flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full font-display text-base sm:text-lg transition-all",
-            mode === 'matrix' 
-              ? "bg-math-accent text-white shadow-lg scale-105" 
-              : "bg-white text-math-accent border-2 border-math-accent/20 hover:border-math-accent"
-          )}
-        >
-          <Sparkles className="w-5 h-5" />
-          Ma Trận
-        </button>
+        {age < 9 && (
+          <button
+            onClick={() => setMode('matrix')}
+            className={cn(
+              "flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full font-display text-base sm:text-lg transition-all",
+              mode === 'matrix' 
+                ? "bg-math-accent text-white shadow-lg scale-105" 
+                : "bg-white text-math-accent border-2 border-math-accent/20 hover:border-math-accent"
+            )}
+          >
+            <Sparkles className="w-5 h-5" />
+            Ma Trận
+          </button>
+        )}
         <button
           onClick={() => setMode('quiz')}
           className={cn(
@@ -191,7 +224,7 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
           )}
         >
           <BrainCircuit className="w-5 h-5" />
-          Đố Vui
+          {age >= 9 ? 'Siêu Tốc' : 'Đố Vui'}
         </button>
       </div>
 
@@ -205,7 +238,7 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
                 tableType === 'multiplication' ? "bg-math-primary border-math-primary text-white shadow-lg" : "bg-white border-gray-100 text-gray-400"
               )}
             >
-              BẢNG NHÂN
+              {age >= 9 ? 'NHÂN GIỎI' : 'BẢNG NHÂN'}
             </button>
             <button
               onClick={() => setTableType('division')}
@@ -214,7 +247,7 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
                 tableType === 'division' ? "bg-math-primary border-math-primary text-white shadow-lg" : "bg-white border-gray-100 text-gray-400"
               )}
             >
-              BẢNG CHIA
+              {age >= 9 ? 'CHIA NHANH' : 'BẢNG CHIA'}
             </button>
           </div>
 
@@ -287,13 +320,13 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="font-display text-2xl sm:text-3xl text-math-primary flex items-center gap-3">
                       <Calculator className="w-8 h-8" />
-                      {tableType === 'multiplication' ? `Bảng nhân ${selectedNum}` : `Bảng chia ${selectedNum}`}
+                      {age >= 9 ? `Luyện tập nhân chia với số ${selectedNum}` : (tableType === 'multiplication' ? `Bảng nhân ${selectedNum}` : `Bảng chia ${selectedNum}`)}
                     </h3>
                     <div className="text-math-secondary font-bold bg-math-secondary/10 px-4 py-2 rounded-full">
                       {Object.values(userAnswers).filter((v, idx) => {
                         const correctVal = tableType === 'multiplication' ? (selectedNum * (idx + 1)) : (idx + 1);
                         return parseInt(v) === correctVal;
-                      }).length}/10
+                      }).length}/{tableRows.length}
                     </div>
                   </div>
                   
@@ -347,35 +380,37 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
                 </div>
 
                 <div className="w-full lg:w-1/2 space-y-6">
-                  <div className="bg-orange-50 p-6 sm:p-8 rounded-3xl border-2 border-orange-100">
-                    <h4 className="font-display text-xl text-orange-600 mb-4 flex items-center gap-2">
-                      <Lightbulb className="w-6 h-6" />
-                      Mẹo ghi nhớ bảng {selectedNum}
-                    </h4>
-                    <p className="text-lg text-gray-700 leading-relaxed italic">
-                      "{getTip(selectedNum)}"
-                    </p>
-                  </div>
+                  {age < 9 && (
+                    <div className="bg-orange-50 p-6 sm:p-8 rounded-3xl border-2 border-orange-100">
+                      <h4 className="font-display text-xl text-orange-600 mb-4 flex items-center gap-2">
+                        <Lightbulb className="w-6 h-6" />
+                        Mẹo ghi nhớ bảng {selectedNum}
+                      </h4>
+                      <p className="text-lg text-gray-700 leading-relaxed italic">
+                        "{getTip(selectedNum)}"
+                      </p>
+                    </div>
+                  )}
 
                   <div className="bg-math-secondary/5 p-6 sm:p-8 rounded-3xl border-2 border-math-secondary/10">
-                    <h4 className="font-display text-xl text-math-secondary mb-4">Tiến độ học tập</h4>
+                    <h4 className="font-display text-xl text-math-secondary mb-4">Tiến độ luyện tập</h4>
                     <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${(Object.values(userAnswers).filter((v, idx) => {
                           const correctVal = tableType === 'multiplication' ? (selectedNum * (idx + 1)) : (idx + 1);
                           return parseInt(v) === correctVal;
-                        }).length / 10) * 100}%` }}
+                        }).length / tableRows.length) * 100}%` }}
                         className="bg-math-secondary h-full relative"
                       >
                         <div className="absolute inset-0 bg-white/20 animate-pulse" />
                       </motion.div>
                     </div>
                     <p className="mt-4 text-center text-lg font-medium text-math-secondary">
-                      Bạn đã thuộc được <span className="text-2xl font-bold">{(Object.values(userAnswers).filter((v, idx) => {
+                      Bạn đã hoàn thành <span className="text-2xl font-bold">{Math.round((Object.values(userAnswers).filter((v, idx) => {
                         const correctVal = tableType === 'multiplication' ? (selectedNum * (idx + 1)) : (idx + 1);
                         return parseInt(v) === correctVal;
-                      }).length / 10) * 100}%</span> bảng này rồi!
+                      }).length / tableRows.length) * 100)}%</span> mục tiêu!
                     </p>
                   </div>
                 </div>
@@ -494,10 +529,20 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
           ) : (
             <>
               <div className="mb-12">
-                <h3 className="font-display text-4xl text-math-secondary mb-6 font-black drop-shadow-sm">Thử Thách Random</h3>
+                <h3 className="font-display text-4xl text-math-secondary mb-6 font-black drop-shadow-sm">
+                  {age >= 9 ? 'Thử Thách Siêu Tốc' : 'Thử Thách Random'}
+                </h3>
                 <div className="flex justify-center gap-12 text-sm font-black text-gray-400 uppercase tracking-[0.2em]">
                   <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-green-500" /> Đúng: {quizScore}</span>
                   <span className="flex items-center gap-2"><XCircle className="w-5 h-5 text-red-500" /> Câu hỏi: {quizCount}/10</span>
+                  {age >= 9 && (
+                    <span className={cn(
+                      "flex items-center gap-2 transition-colors",
+                      timeLeft <= 3 ? "text-red-500 animate-pulse" : "text-orange-500"
+                    )}>
+                      <RefreshCw className="w-5 h-5" /> {timeLeft}s
+                    </span>
+                  )}
                 </div>
               </div>
 

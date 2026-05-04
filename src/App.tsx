@@ -21,7 +21,8 @@ import {
   Trophy,
   Star as StarIcon,
   Medal,
-  Award
+  Award,
+  ClipboardList
 } from 'lucide-react';
 import { mathService, MATH_TOPICS } from './services/mathService';
 import { RewardService, Achievement } from './services/rewardService';
@@ -32,6 +33,7 @@ import { ClockLesson } from './components/ClockLesson';
 import { ClockPractice } from './components/ClockPractice';
 import { WelcomeSection } from './components/WelcomeSection';
 import { OperationPractice } from './components/OperationPractice';
+import { MockExam } from './components/MockExam';
 import { SettingsModal } from './components/SettingsModal';
 import { SettingsService } from './services/settingsService';
 import { clsx, type ClassValue } from 'clsx';
@@ -42,7 +44,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'intro' | 'table' | 'practice' | 'clock' | 'fun' | 'operations'>('intro');
+  const [activeTab, setActiveTab] = useState<'intro' | 'table' | 'practice' | 'clock' | 'fun' | 'operations' | 'exam'>('intro');
   const [clockMode, setClockMode] = useState<'lesson' | 'practice'>('lesson');
   const [age, setAge] = useState(7);
   const [selectedTopic, setSelectedTopic] = useState('general');
@@ -177,6 +179,7 @@ export default function App() {
               { id: 'operations', label: 'Cộng Trừ', icon: Plus },
               { id: 'table', label: 'Nhân Chia', icon: BookOpen },
               { id: 'clock', label: 'Xem Giờ', icon: Clock, hidden: age >= 8 },
+              { id: 'exam', label: 'Luyện Đề', icon: ClipboardList },
               { id: 'practice', label: 'Luyện Tập', icon: GraduationCap },
               { id: 'fun', label: 'Game Vui', icon: Sparkles },
             ].filter((t: any) => !t.hidden).map((tab: any) => (
@@ -337,6 +340,18 @@ export default function App() {
             </motion.div>
           )}
 
+          {activeTab === 'exam' && (
+            <motion.div
+              key="exam"
+              variants={tabVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+            >
+              <MockExam age={age} />
+            </motion.div>
+          )}
+
           {activeTab === 'clock' && (
             <motion.div
               key="clock"
@@ -385,6 +400,7 @@ export default function App() {
           { id: 'operations', label: 'Tính Nhẩm', icon: Plus },
           { id: 'table', label: 'Nhân Chia', icon: BookOpen },
           { id: 'clock', label: 'Xem Giờ', icon: Clock, hidden: age >= 8 },
+          { id: 'exam', label: 'Luyện Đề', icon: ClipboardList },
           { id: 'practice', label: 'Luyện Tập', icon: GraduationCap },
           { id: 'fun', label: 'Game Vui', icon: Sparkles },
         ].filter((t: any) => !t.hidden).map((tab: any) => (

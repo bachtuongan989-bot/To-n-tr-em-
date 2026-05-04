@@ -10,7 +10,8 @@ import {
   GraduationCap, 
   Heart,
   ChevronRight,
-  BrainCircuit
+  BrainCircuit,
+  ClipboardList
 } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -128,6 +129,13 @@ export const WelcomeSection: React.FC<WelcomeSectionProps & { age?: number }> = 
               onClick={() => onStart('clock')}
             />
           )}
+          <FeatureCard 
+            icon={ClipboardList}
+            color="bg-orange-500"
+            title="Luyện Đề Thi"
+            description="Các đề kiểm tra bám sát chương trình Kết Nối Tri Thức với đầy đủ trắc nghiệm và tự luận."
+            onClick={() => onStart('exam')}
+          />
           <FeatureCard 
             icon={GraduationCap}
             color="bg-emerald-500"

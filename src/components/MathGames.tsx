@@ -40,8 +40,8 @@ export const MathGames: React.FC<MathGamesProps> = ({ age = 7 }) => {
   }, [age]);
   
   // Custom Settings
-  const [selectedOps, setSelectedOps] = useState<string[]>(['+', '-']);
-  const [maxRange, setMaxRange] = useState(20);
+  const [selectedOps, setSelectedOps] = useState<string[]>(age >= 9 ? ['*', '/', '+', '-'] : ['+', '-']);
+  const [maxRange, setMaxRange] = useState(age >= 9 ? 50 : 20);
   
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -331,8 +331,12 @@ export const MathGames: React.FC<MathGamesProps> = ({ age = 7 }) => {
                   <Brain className="w-8 h-8 fill-current" />
                 </div>
                 <div>
-                  <h2 className="font-display text-3xl text-gray-800">Chọn Trò Chơi</h2>
-                  <p className="text-gray-500">Rèn luyện phản xạ toán học cùng Math Buddy!</p>
+                  <h2 className="font-display text-3xl text-gray-800">
+                    {age >= 9 ? 'Thử Thách Toán Học' : 'Chọn Trò Chơi'}
+                  </h2>
+                  <p className="text-gray-500">
+                    {age >= 9 ? 'Rèn luyện tư duy và tốc độ tính toán siêu hạng!' : 'Rèn luyện phản xạ toán học cùng Math of Bơ!'}
+                  </p>
                 </div>
               </div>
               
