@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Fredoka:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fredoka", sans-serif;
+  --font-display: "Be Vietnam Pro", sans-serif;
   
   --color-math-primary: var(--theme-primary, #FF6B6B);
   --color-math-secondary: var(--theme-secondary, #4ECDC4);

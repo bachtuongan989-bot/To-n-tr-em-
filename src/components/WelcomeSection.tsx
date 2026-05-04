@@ -49,7 +49,7 @@ interface WelcomeSectionProps {
   onStart: (tab: any) => void;
 }
 
-export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onStart }) => {
+export const WelcomeSection: React.FC<WelcomeSectionProps & { age?: number }> = ({ onStart, age = 7 }) => {
   return (
     <div className="max-w-5xl mx-auto space-y-16 pb-20">
       {/* Hero Section */}
@@ -70,7 +70,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onStart }) => {
             className="font-display text-4xl md:text-7xl text-gray-800 leading-tight"
           >
             Chào mừng bé đến với <br />
-            <span className="text-math-primary">Math Buddy!</span>
+            <span className="text-math-primary">Math of Bơ!</span>
           </motion.h1>
           <motion.p 
             initial={{ y: 20, opacity: 0 }}
@@ -119,13 +119,15 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onStart }) => {
             description="Làm chủ bảng cửu chương nháy mắt bằng các mẹo ghi nhớ cực hay và các bài ôn tập vui vẻ."
             onClick={() => onStart('table')}
           />
-          <FeatureCard 
-            icon={Clock}
-            color="bg-math-secondary"
-            title="Học Xem Đồng Hồ"
-            description="Bé sẽ biết cách nhìn giờ, phút và làm quen với thời gian qua mô hình đồng hồ thực tế."
-            onClick={() => onStart('clock')}
-          />
+          {age < 8 && (
+            <FeatureCard 
+              icon={Clock}
+              color="bg-math-secondary"
+              title="Học Xem Đồng Hồ"
+              description="Bé sẽ biết cách nhìn giờ, phút và làm quen với thời gian qua mô hình đồng hồ thực tế."
+              onClick={() => onStart('clock')}
+            />
+          )}
           <FeatureCard 
             icon={GraduationCap}
             color="bg-emerald-500"
@@ -150,14 +152,14 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onStart }) => {
         </div>
         <div className="space-y-6">
           <h2 className="font-display text-3xl md:text-4xl text-gray-800 leading-tight">
-            Sứ mệnh của <span className="text-math-secondary">Math Buddy</span>
+            Sứ mệnh của <span className="text-math-secondary">Math of Bơ</span>
           </h2>
           <div className="space-y-4 text-gray-600 text-lg">
             <p>
               Chúng mình tin rằng Toán học là một ngôn ngữ tuyệt vời của vũ trụ, và mỗi bé đều có khả năng trở thành một "nhà toán học nhỏ tuổi".
             </p>
             <p>
-              Math Buddy ra đời để xóa bỏ rào cản sợ hãi, biến những con số khô khan thành những người bạn, giúp bé xây dựng nền tảng tư duy vững chắc và niềm đam mê học hỏi suốt đời.
+              Math of Bơ ra đời để xóa bỏ rào cản sợ hãi, biến những con số khô khan thành những người bạn, giúp bé xây dựng nền tảng tư duy vững chắc và niềm đam mê học hỏi suốt đời.
             </p>
           </div>
           <div className="flex gap-4 pt-4">

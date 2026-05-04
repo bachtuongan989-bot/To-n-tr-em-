@@ -41,8 +41,8 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
   const [quizCount, setQuizCount] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
 
-  const numbers = [2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const tableRows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const numbers = age >= 10 ? [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] : [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const tableRows = age >= 10 ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   useEffect(() => {
     if (mode === 'learn') {
@@ -64,8 +64,10 @@ export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 
   };
 
   const generateQuizQuestion = () => {
-    const a = quizType === 'specific' ? selectedNum : Math.floor(Math.random() * 9) + 2;
-    const b = Math.floor(Math.random() * 10) + 1;
+    const range = age >= 10 ? 19 : 9;
+    const offset = 2;
+    const a = quizType === 'specific' ? selectedNum : Math.floor(Math.random() * range) + offset;
+    const b = age >= 10 ? Math.floor(Math.random() * 12) + 1 : Math.floor(Math.random() * 10) + 1;
     setQuizQuestion({ a, b });
     setQuizInput('');
     setQuizFeedback(null);

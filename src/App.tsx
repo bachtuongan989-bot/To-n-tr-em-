@@ -139,6 +139,13 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    // Hide clock if age >= 8
+    if (age >= 8 && activeTab === 'clock') {
+      setActiveTab('intro');
+    }
+  }, [age, activeTab]);
+
   return (
     <div className="min-h-screen font-sans selection:bg-math-primary/30">
       {/* Header */}
@@ -169,10 +176,10 @@ export default function App() {
             {[
               { id: 'operations', label: 'Cộng Trừ', icon: Plus },
               { id: 'table', label: 'Nhân Chia', icon: BookOpen },
-              { id: 'clock', label: 'Xem Giờ', icon: Clock },
+              { id: 'clock', label: 'Xem Giờ', icon: Clock, hidden: age >= 8 },
               { id: 'practice', label: 'Luyện Tập', icon: GraduationCap },
               { id: 'fun', label: 'Game Vui', icon: Sparkles },
-            ].map((tab: any) => (
+            ].filter((t: any) => !t.hidden).map((tab: any) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
@@ -220,9 +227,12 @@ export default function App() {
               animate="animate"
               exit="exit"
             >
-              <WelcomeSection onStart={(tab) => {
-                setActiveTab(tab);
-              }} />
+              <WelcomeSection 
+                age={age}
+                onStart={(tab) => {
+                  setActiveTab(tab);
+                }} 
+              />
             </motion.div>
           )}
 
@@ -374,10 +384,10 @@ export default function App() {
         {[
           { id: 'operations', label: 'Tính Nhẩm', icon: Plus },
           { id: 'table', label: 'Nhân Chia', icon: BookOpen },
-          { id: 'clock', label: 'Xem Giờ', icon: Clock },
+          { id: 'clock', label: 'Xem Giờ', icon: Clock, hidden: age >= 8 },
           { id: 'practice', label: 'Luyện Tập', icon: GraduationCap },
           { id: 'fun', label: 'Game Vui', icon: Sparkles },
-        ].map((tab: any) => (
+        ].filter((t: any) => !t.hidden).map((tab: any) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
