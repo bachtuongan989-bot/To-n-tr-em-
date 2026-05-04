@@ -6,8 +6,7 @@ export const MATH_TOPICS = [
   { id: 'general', name: 'Tổng hợp', icon: '📚' },
   { id: 'fractions', name: 'Phân số', icon: '🍰' },
   { id: 'decimals', name: 'Số thập phân', icon: '🔢' },
-  { id: 'geometry', name: 'Hình học không gian', icon: '📦' },
-  { id: 'logic', name: 'Toán tư duy', icon: '🧠' },
+  { id: 'geometry', name: 'Hình học tiểu học', icon: '📦' },
   { id: 'word_problems', name: 'Giải toán có lời văn', icon: '📝' },
 ];
 
@@ -148,22 +147,30 @@ export const mathService = {
     const topic = MATH_TOPICS.find(t => t.id === topicId)?.name || 'Tổng hợp';
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Bạn là giáo viên toán lớp ${grade}, chủ đề ${topic}. Hãy tạo đúng 10 câu hỏi trắc nghiệm. 
-      Yêu cầu:
-      1. Trường "answer" phải trùng khớp 100% với 1 trong các "options".
-      2. Nội dung phù hợp với học sinh lớp ${grade}.
+      contents: `Bạn là một chuyên gia khảo thí toán học cấp tiểu học tại Việt Nam. Hãy soạn một đề thi toán học kỳ chất lượng cao cho học sinh lớp ${grade} (khoảng ${age} tuổi) với chủ đề "${topic}".
       
-      Trả về JSON:
+      Yêu cầu về nội dung:
+      1. Đề thi phải bao gồm 10 câu hỏi trắc nghiệm khách quan với 4 lựa chọn (A, B, C, D).
+      2. Cấu trúc đề thi: 3 câu nhận biết (dễ), 4 câu thông hiểu (trung bình), 2 câu vận dụng (khó) và 1 câu vận dụng cao (cực khó/thách thức).
+      3. Câu hỏi phải đa dạng: tính toán thuần túy, giải toán có lời văn, hình học, đo lường và tư duy logic.
+      4. Ngôn ngữ: Trong sáng, chuẩn sư phạm tiểu học Việt Nam, dễ hiểu nhưng vẫn trang trọng của một đề thi.
+
+      Yêu cầu về kỹ thuật:
+      1. Trường "answer" PHẢI trùng khớp hoàn toàn (từng ký tự) với một trong các phần tử trong mảng "options".
+      2. Trường "explanation" phải giải thích cặn kẽ, sư phạm để trẻ tự học được từ lỗi sai.
+      3. Trường "examName" phải thật kêu, ví dụ: "ĐỀ THI TRẠNG NGUYÊN NHÍ - TOÁN LỚP ${grade}".
+
+      Trả về JSON theo cấu trúc:
       { 
-        "examName": "ĐỀ THI TOÁN LỚP ${grade} - ${topic}", 
+        "examName": "Tên Đề Thi", 
         "timeLimit": 40, 
         "questions": [
           { 
             "id": 1, 
-            "question": "Câu hỏi?", 
-            "options": ["A", "B", "C", "D"], 
-            "answer": "đúng (trùng 1 trong options)", 
-            "explanation": "giải thích" 
+            "question": "Nội dung câu hỏi?", 
+            "options": ["Lựa chọn A", "Lựa chọn B", "Lựa chọn C", "Lựa chọn D"], 
+            "answer": "Lựa chọn đúng (copy paste từ options)", 
+            "explanation": "Giải thích chi tiết tại sao đáp án đó đúng và các đáp án khác sai." 
           }
         ] 
       }`,
@@ -175,6 +182,16 @@ export const mathService = {
     const result = JSON.parse(response.text);
     sessionCache[cacheKey] = result;
     return result;
+  },
+
+  async generateExamFeedback(score: number, total: number, age: number) {
+    const response = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: `Bạn là một giáo viên toán tiểu học tâm lý và khích lệ. Học sinh ${age} tuổi vừa hoàn thành bài thi với số điểm ${score}/${total}. 
+      Hãy đưa ra một lời nhận xét ngắn gọn (khoảng 2-3 câu), vui vẻ, khen ngợi những gì trẻ làm được và đưa ra lời khuyên chân thành nếu cần cố gắng thêm. 
+      Ngôn ngữ phải gần gũi với trẻ em Việt Nam.`,
+    });
+    return response.text;
   },
 
   async speakText(text: string) {

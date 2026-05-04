@@ -23,9 +23,20 @@ interface Problem {
   hint: string;
 }
 
-export const OperationPractice: React.FC = () => {
+interface OperationPracticeProps {
+  age?: number;
+}
+
+export const OperationPractice: React.FC<OperationPracticeProps> = ({ age = 7 }) => {
   const [opType, setOpType] = useState<'+' | '-' | 'both'>('both');
   const [grade, setGrade] = useState<1 | 2 | 3 | 4 | 5>(2);
+
+  useEffect(() => {
+    // Map age to grade: 6->1, 7->2, 8->3, 9->4, 10+->5
+    const calculatedGrade = Math.max(1, Math.min(5, age - 5)) as 1 | 2 | 3 | 4 | 5;
+    setGrade(calculatedGrade);
+  }, [age]);
+
   const [totalQuestions, setTotalQuestions] = useState(15);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [score, setScore] = useState(0);
@@ -34,6 +45,9 @@ export const OperationPractice: React.FC = () => {
   const [userAnswer, setUserAnswer] = useState('');
   const [gameState, setGameState] = useState<'setup' | 'playing' | 'finished'>('setup');
   const [feedback, setFeedback] = useState<'none' | 'correct' | 'wrong'>('none');
+  const [adaptiveLevel, setAdaptiveLevel] = useState(0); // -1 (easy), 0 (normal), 1 (hard), 2 (master)
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0);
+  const [levelMessage, setLevelMessage] = useState<string | null>(null);
 
   const playSound = (url: string) => {
     const audio = new Audio(url);
@@ -46,27 +60,37 @@ export const OperationPractice: React.FC = () => {
     let selectedOp = opType === 'both' ? (Math.random() > 0.5 ? '+' as const : '-' as const) : opType as '+' | '-';
     let selectedOp2 = Math.random() > 0.5 ? '+' as const : '-' as const;
     
-    // Scale difficulty based on Grade and Progress
-    const progress = currentIdx / totalQuestions;
-    let aDigits = 1;
-    let bDigits = 1;
+    // Scale difficulty based on Grade, Age and Adaptive Level
+    let aDigits = 2;
+    let bDigits = 2;
     
     if (grade === 1) {
-      aDigits = progress > 0.5 ? 2 : 1;
-      bDigits = progress > 0.8 ? 2 : 1;
+      aDigits = (Math.random() > 0.5 || adaptiveLevel > 0) ? 2 : 1;
+      bDigits = adaptiveLevel > 0 ? 2 : 1;
     } else if (grade === 2) {
-      // Focus on 3-digit +/- 2-digit for mental math as requested
       const rand = Math.random();
-      if (rand < 0.6) { // 60% chance of 3-digit vs 2-digit
-         aDigits = 3; bDigits = 2;
-      } else if (rand < 0.85) { // 25% chance of 2-digit vs 2-digit
-         aDigits = 2; bDigits = 2;
-      } else { // 15% chance of 3-digit vs 3-digit
-         aDigits = 3; bDigits = 3;
-      }
+      if (adaptiveLevel >= 1) { aDigits = 3; bDigits = 2; }
+      else if (rand < 0.5) { aDigits = 2; bDigits = 2; }
+      else { aDigits = 3; bDigits = 1; }
+    } else if (grade === 3) {
+      const rand = Math.random();
+      if (adaptiveLevel >= 1) { aDigits = 3; bDigits = 3; }
+      else if (rand < 0.4) { aDigits = 3; bDigits = 2; }
+      else { aDigits = 3; bDigits = 3; }
     } else {
-      aDigits = grade >= 4 ? 4 : 3;
-      bDigits = grade >= 3 ? 3 : 2;
+      const rand = Math.random();
+      if (adaptiveLevel >= 1) { aDigits = 4; bDigits = 4; }
+      else if (rand < 0.4) { aDigits = 4; bDigits = 3; }
+      else { aDigits = 3; bDigits = 3; }
+    }
+
+    // Apply adaptive level adjustments to digits
+    if (adaptiveLevel === -1) {
+      aDigits = Math.max(1, aDigits - 1);
+      bDigits = Math.max(1, bDigits - 1);
+    } else if (adaptiveLevel === 2) {
+      aDigits++;
+      bDigits++;
     }
 
     const minA = Math.pow(10, aDigits - 1);
@@ -184,8 +208,24 @@ export const OperationPractice: React.FC = () => {
     
     if (isCorrect) {
       setScore(s => s + 1);
+      setConsecutiveCorrect(c => {
+        const newCount = c + 1;
+        if (newCount === 3 && adaptiveLevel < 2) {
+          setAdaptiveLevel(prev => prev + 1);
+          setLevelMessage("Siêu nhân toán học! Độ khó đã tăng lên! 🚀");
+          setTimeout(() => setLevelMessage(null), 3000);
+          return 0;
+        }
+        return newCount;
+      });
       playSound(CORRECT_SOUND);
     } else {
+      setConsecutiveCorrect(0);
+      if (adaptiveLevel > -1) {
+        setAdaptiveLevel(prev => prev - 1);
+        setLevelMessage("Đừng lo, chúng ta sẽ ôn lại cơ bản nhé! ❤️");
+        setTimeout(() => setLevelMessage(null), 3000);
+      }
       playSound(WRONG_SOUND);
     }
   };
@@ -299,7 +339,19 @@ export const OperationPractice: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
           >
-            <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100 relative">
+              <AnimatePresence>
+                {levelMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="absolute -top-12 inset-x-0 mx-auto w-fit bg-math-accent text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg z-50 pointer-events-none"
+                  >
+                    {levelMessage}
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <div className="flex items-center gap-6">
                 <div>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tiến độ</p>
@@ -310,6 +362,20 @@ export const OperationPractice: React.FC = () => {
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Đúng</p>
                   <p className="text-xl font-display font-bold text-green-500">{score}</p>
                 </div>
+                {adaptiveLevel !== 0 && (
+                  <>
+                    <div className="w-px h-8 bg-gray-100" />
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Cấp độ</p>
+                      <div className={cn(
+                        "px-2 py-0.5 rounded text-[10px] font-black uppercase text-white",
+                        adaptiveLevel > 0 ? "bg-orange-500" : "bg-blue-500"
+                      )}>
+                        {adaptiveLevel === -1 ? 'Cơ bản' : adaptiveLevel === 1 ? 'Thách thức' : 'Bậc thầy'}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 <button 

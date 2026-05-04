@@ -19,8 +19,14 @@
 
 body {
   background-color: var(--color-math-bg);
-  color: #2D3436;
+  color: #1A1A1A;
   transition: background-color 0.5s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.text-high-contrast {
+  color: #000 !important;
 }
 
 .glass-card {

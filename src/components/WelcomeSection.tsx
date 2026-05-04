@@ -2,7 +2,6 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { 
   Sparkles, 
-  Calculator, 
   Clock, 
   Puzzle, 
   Plus,
@@ -90,7 +89,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onStart }) => {
           className="flex flex-wrap justify-center gap-4"
         >
           <button 
-            onClick={() => onStart('solve')}
+            onClick={() => onStart('practice')}
             className="px-10 py-5 bg-math-primary text-white font-black rounded-3xl shadow-xl shadow-math-primary/30 hover:scale-105 active:scale-95 transition-all text-xl flex items-center gap-3"
           >
             HỌC NGAY THÔI <Sparkles className="w-6 h-6" />
@@ -106,13 +105,6 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onStart }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <FeatureCard 
-            icon={Calculator}
-            color="bg-math-primary"
-            title="Giải Toán Thông Minh"
-            description="Chụp ảnh bài toán hoặc nhập đề bài, Math Buddy sẽ phân tích hình ảnh và giải thích từng bước thật chi tiết kèm minh họa sinh động."
-            onClick={() => onStart('solve')}
-          />
           <FeatureCard 
             icon={Plus}
             color="bg-indigo-500"

@@ -9,7 +9,7 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-type GameMode = 'speed' | 'compare' | 'missing';
+type GameMode = 'speed' | 'thinking' | 'word_problems' | 'logic_math';
 type Difficulty = 'easy' | 'medium' | 'hard';
 
 const CORRECT_SOUND = 'https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3';
@@ -23,10 +23,21 @@ const VISUAL_ICONS = [
   { icon: Puppy, color: 'text-amber-600', name: 'bạn cún' },
 ];
 
-export const MathGames = () => {
+interface MathGamesProps {
+  age?: number;
+}
+
+export const MathGames: React.FC<MathGamesProps> = ({ age = 7 }) => {
   const [gameState, setGameState] = useState<'idle' | 'playing' | 'settings' | 'finished'>('idle');
   const [gameMode, setGameMode] = useState<GameMode>('speed');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+
+  useEffect(() => {
+    // Set difficulty based on age
+    if (age <= 7) setDifficulty('easy');
+    else if (age <= 10) setDifficulty('medium');
+    else setDifficulty('hard');
+  }, [age]);
   
   // Custom Settings
   const [selectedOps, setSelectedOps] = useState<string[]>(['+', '-']);
@@ -38,6 +49,8 @@ export const MathGames = () => {
   const [timeLeft, setTimeLeft] = useState(30);
   const [currentProblem, setCurrentProblem] = useState<any>({ a: 0, b: 0, op: '+', answer: 0, question: '' });
   const [options, setOptions] = useState<any[]>([]);
+  const [lastProblemTime, setLastProblemTime] = useState<number>(Date.now());
+  const [adaptiveMessage, setAdaptiveMessage] = useState<string | null>(null);
 
   const playSound = (url: string) => {
     const audio = new Audio(url);
@@ -50,86 +63,161 @@ export const MathGames = () => {
     const ops = selectedOps.length > 0 ? selectedOps : ['+'];
     op = ops[Math.floor(Math.random() * ops.length)];
     
-    // Adjust range based on difficulty
+    // Adjust range and complexity based on difficulty
     let range = 20;
-    if (difficulty === 'easy') range = 10;
-    else if (difficulty === 'hard') range = 100;
+    let factorLimit = 9;
+    
+    if (difficulty === 'easy') {
+      range = 10;
+      factorLimit = 5;
+    } else if (difficulty === 'medium') {
+      range = 30;
+      factorLimit = 10;
+    } else if (difficulty === 'hard') {
+      range = 100;
+      factorLimit = 15;
+    }
 
     if (gameMode === 'speed') {
       if (op === '+') {
         a = Math.floor(Math.random() * range) + 1;
         b = Math.floor(Math.random() * range) + 1;
-        answer = a + b;
+        
+        // For hard mode, occasionally add a third number
+        if (difficulty === 'hard' && Math.random() > 0.6) {
+          const c = Math.floor(Math.random() * 20) + 1;
+          answer = a + b + c;
+          question = `${a} + ${b} + ${c} = ?`;
+        } else {
+          answer = a + b;
+          question = `${a} + ${b} = ?`;
+        }
       } else if (op === '-') {
-        // Ensure non-negative answer and reasonable range
-        a = Math.floor(Math.random() * (range * 1.2)) + 5;
-        b = Math.floor(Math.random() * (a - 1)) + 1;
+        if (difficulty === 'hard') {
+          a = Math.floor(Math.random() * 100) + 20;
+          b = Math.floor(Math.random() * (a - 10)) + 5;
+        } else {
+          a = Math.floor(Math.random() * range) + 5;
+          b = Math.floor(Math.random() * (a - 1)) + 1;
+        }
         answer = a - b;
+        question = `${a} - ${b} = ?`;
       } else if (op === '*') {
-        const multLimit = difficulty === 'hard' ? 12 : (difficulty === 'easy' ? 6 : 9);
-        a = Math.floor(Math.random() * multLimit) + 2;
-        b = Math.floor(Math.random() * multLimit) + 2;
+        a = Math.floor(Math.random() * (factorLimit - 1)) + 2;
+        b = Math.floor(Math.random() * (factorLimit - 1)) + 2;
         answer = a * b;
+        question = `${a} × ${b} = ?`;
       } else if (op === '/') {
-        const divLimit = difficulty === 'hard' ? 12 : (difficulty === 'easy' ? 6 : 9);
-        b = Math.floor(Math.random() * divLimit) + 2;
-        answer = Math.floor(Math.random() * divLimit) + 2;
-        a = b * answer;
+        b = Math.floor(Math.random() * (factorLimit - 1)) + 2;
+        const tempAnswer = Math.floor(Math.random() * (factorLimit - 1)) + 1;
+        a = b * tempAnswer;
+        answer = tempAnswer;
+        question = `${a} ÷ ${b} = ?`;
       } else {
-        // Fallback for division if op is unexpectedly something else but division was intended
-        b = 5;
-        answer = 5;
-        a = 25;
+        a = 2; b = 2; answer = 4; question = "2 + 2 = ?";
       }
-      question = `${a} ${op === '*' ? '×' : op === '/' ? '÷' : op} ${b} = ?`;
+      
       newOptions = [answer];
       while (newOptions.length < 4) {
         const offset = Math.floor(Math.random() * 10) - 5;
         const wrong = Math.abs(answer + (offset === 0 ? 1 : offset));
         if (wrong !== answer && !newOptions.includes(wrong)) newOptions.push(wrong);
       }
-    } else if (gameMode === 'compare') {
-      a = Math.floor(Math.random() * range) + 1;
-      b = Math.floor(Math.random() * range) + 1;
-      while (a === b) b = Math.floor(Math.random() * range) + 1;
-      const type = Math.random() > 0.5 ? 'lớn hơn' : 'nhỏ hơn';
-      question = `Số nào ${type}: ${a} hay ${b}?`;
-      answer = type === 'lớn hơn' ? Math.max(a, b) : Math.min(a, b);
-      newOptions = [a, b];
-    } else if (gameMode === 'missing') {
-      // Range adjustment for missing number
-      const mRange = difficulty === 'hard' ? 100 : (difficulty === 'easy' ? 10 : 20);
-      
-      if (op === '+') {
-        a = Math.floor(Math.random() * mRange) + 1;
-        const missing = Math.floor(Math.random() * mRange) + 1;
-        b = a + missing;
-        answer = missing;
-        question = `${a} + ? = ${b}`;
-      } else if (op === '-') {
-        const full = Math.floor(Math.random() * mRange) + mRange;
-        const sub = Math.floor(Math.random() * mRange) + 1;
-        answer = sub;
-        question = `${full} - ? = ${full - sub}`;
-      } else if (op === '*') {
-        a = Math.floor(Math.random() * 9) + 2;
-        answer = Math.floor(Math.random() * 9) + 2;
-        b = a * answer;
-        question = `${a} × ? = ${b}`;
+    } else if (gameMode === 'thinking') {
+      // Merge Compare and Missing
+      const isCompare = Math.random() > 0.5;
+      if (isCompare) {
+        if (difficulty === 'hard') {
+          // Compare expressions in hard mode
+          const v1 = Math.floor(Math.random() * 20) + 5;
+          const v2 = Math.floor(Math.random() * 20) + 5;
+          const v3 = Math.floor(Math.random() * 40) + 10;
+          const val1 = v1 + v2;
+          const val2 = v3;
+          
+          if (Math.random() > 0.5) {
+            question = `Bên nào lớn hơn: ${v1}+${v2} hay ${v3}?`;
+            answer = val1 >= val2 ? `${v1}+${v2}` : `${v3}`;
+            newOptions = [`${v1}+${v2}`, `${v3}`];
+          } else {
+            question = `Bên nào nhỏ hơn: ${v1}+${v2} hay ${v3}?`;
+            answer = val1 <= val2 ? `${v1}+${v2}` : `${v3}`;
+            newOptions = [`${v1}+${v2}`, `${v3}`];
+          }
+        } else {
+          a = Math.floor(Math.random() * range) + 1;
+          b = Math.floor(Math.random() * range) + 1;
+          while (a === b) b = Math.floor(Math.random() * range) + 1;
+          const type = Math.random() > 0.5 ? 'lớn hơn' : 'nhỏ hơn';
+          question = `Số nào ${type}: ${a} hay ${b}?`;
+          answer = type === 'lớn hơn' ? Math.max(a, b) : Math.min(a, b);
+          newOptions = [a, b];
+        }
       } else {
-        a = 10;
-        answer = 5;
-        question = `10 + ? = 15`;
+        // Missing Number
+        const mRange = difficulty === 'hard' ? 80 : (difficulty === 'easy' ? 10 : 30);
+        if (op === '+') {
+          a = Math.floor(Math.random() * mRange) + 1;
+          const missing = Math.floor(Math.random() * mRange) + 1;
+          const resVal = a + missing;
+          answer = missing;
+          question = `${a} + ? = ${resVal}`;
+        } else {
+          const result = Math.floor(Math.random() * mRange) + 1;
+          const missing = Math.floor(Math.random() * mRange) + 1;
+          const full = result + missing;
+          answer = missing;
+          question = `${full} - ? = ${result}`;
+        }
+        newOptions = [answer];
+        while (newOptions.length < 4) {
+          const wrong = Math.max(1, (answer as number) + (Math.floor(Math.random() * 10) - 5));
+          if (wrong !== (answer as number) && !newOptions.includes(wrong)) newOptions.push(wrong);
+        }
       }
+    } else if (gameMode === 'word_problems') {
+      // Basic word problems
+      const problems = [
+        { q: `Mẹ có {a} quả táo, mẹ cho bé {b} quả. Mẹ còn bao nhiêu quả táo?`, op: '-', res: (a: number, b: number) => a - b },
+        { q: `Trong rổ có {a} quả cam, bé bỏ thêm {b} quả vào. Có tất cả mấy quả cam?`, op: '+', res: (a: number, b: number) => a + b },
+        { q: `Bé có {a} cái kẹo, chị có nhiều hơn bé {b} cái. Hỏi chị có bao nhiêu cái kẹo?`, op: '+', res: (a: number, b: number) => a + b },
+        { q: `Một cành cây có {a} con chim, {b} con bay đi. Còn lại bao nhiêu con chim?`, op: '-', res: (a: number, b: number) => a - b },
+      ];
+      const p = problems[Math.floor(Math.random() * problems.length)];
+      a = Math.floor(Math.random() * range) + 10;
+      b = Math.floor(Math.random() * 9) + 1;
+      answer = p.res(a, b);
+      question = p.q.replace('{a}', a.toString()).replace('{b}', b.toString());
       newOptions = [answer];
       while (newOptions.length < 4) {
         const wrong = Math.max(1, answer + (Math.floor(Math.random() * 10) - 5));
+        if (wrong !== answer && !newOptions.includes(wrong)) newOptions.push(wrong);
+      }
+    } else if (gameMode === 'logic_math') {
+      const logicSet = [
+        { q: `Số lẻ tiếp theo sau {a} là số nào?`, fn: (a: number) => a + 2, range: 20 },
+        { q: `Số chẵn đứng trước {a} là số nào?`, fn: (a: number) => a - 2, range: 20 },
+        { q: `Dãy số: 2, 4, 6, ... Số tiếp theo là?`, fn: () => 8, fixed: true },
+        { q: `Dãy số: 5, 10, 15, ... Số tiếp theo là?`, fn: () => 20, fixed: true },
+      ];
+      const l = logicSet[Math.floor(Math.random() * logicSet.length)];
+      if (l.fixed) {
+        answer = (l as any).fn();
+      } else {
+        a = (Math.floor(Math.random() * 10) * 2) + (l.q.includes('lẻ') ? 1 : 2);
+        answer = (l as any).fn(a);
+      }
+      question = l.q.replace('{a}', a?.toString() || '');
+      newOptions = [answer];
+      while (newOptions.length < 4) {
+        const wrong = Math.max(1, answer as number + (Math.floor(Math.random() * 6) - 3));
         if (wrong !== answer && !newOptions.includes(wrong)) newOptions.push(wrong);
       }
     }
     
     setCurrentProblem({ a, b, op, answer, question });
     setOptions(newOptions.sort(() => Math.random() - 0.5));
+    setLastProblemTime(Date.now());
   }, [gameMode, selectedOps, difficulty]);
 
   const startGame = (mode: GameMode) => {
@@ -137,7 +225,13 @@ export const MathGames = () => {
     setScore(0);
     setCorrectCount(0);
     setIncorrectCount(0);
-    setTimeLeft(30);
+    
+    // Set time based on difficulty
+    let time = 30;
+    if (difficulty === 'easy') time = 45;
+    else if (difficulty === 'hard') time = 60;
+    
+    setTimeLeft(time);
     setGameState('playing');
     playSound(START_SOUND);
     setTimeout(() => generateProblem(), 0);
@@ -151,11 +245,12 @@ export const MathGames = () => {
       setGameState('finished');
       playSound(FINISH_SOUND);
       
-      // Award Stars
-      const baseStars = Math.floor(score / 10);
+      // Award Stars with difficulty multiplier
+      const multiplier = difficulty === 'hard' ? 2 : (difficulty === 'medium' ? 1.5 : 1);
+      const baseStars = Math.floor((score / 10) * multiplier);
       let bonusStars = 0;
-      if (score >= 100) bonusStars += 10;
-      if (score >= 200) bonusStars += 30;
+      if (score >= 100) bonusStars += Math.floor(10 * multiplier);
+      if (score >= 200) bonusStars += Math.floor(30 * multiplier);
       RewardService.addStars(baseStars + bonusStars);
 
       if (score >= 200) {
@@ -171,14 +266,35 @@ export const MathGames = () => {
   }, [gameState, timeLeft]);
 
   const handleAnswer = (choice: any) => {
-    if (choice === currentProblem.answer) {
+    const timeTaken = Date.now() - lastProblemTime;
+    const isCorrect = choice === currentProblem.answer;
+
+    if (isCorrect) {
       setScore(s => s + 10);
-      setCorrectCount(c => c + 1);
+      setCorrectCount(c => {
+        const newCount = c + 1;
+        // Adaptive level up: 5 correct answers in a row OR fast answer (under 2s) 3 times
+        if (newCount % 5 === 0 && difficulty !== 'hard') {
+          setDifficulty(prev => prev === 'easy' ? 'medium' : 'hard');
+          setAdaptiveMessage("Độ khó đã tăng! Bé làm nhanh quá! 🌟");
+          setTimeout(() => setAdaptiveMessage(null), 3000);
+        }
+        return newCount;
+      });
       playSound(CORRECT_SOUND);
       generateProblem();
     } else {
       setScore(s => Math.max(0, s - 5));
-      setIncorrectCount(i => i + 1);
+      setIncorrectCount(i => {
+        const newCount = i + 1;
+        // Adaptive level down: 2 wrong answers
+        if (newCount % 2 === 0 && difficulty !== 'easy') {
+          setDifficulty(prev => prev === 'hard' ? 'medium' : 'easy');
+          setAdaptiveMessage("Đang ôn tập lại các số nhỏ hơn nhé! ❤️");
+          setTimeout(() => setAdaptiveMessage(null), 3000);
+        }
+        return newCount;
+      });
       playSound(WRONG_SOUND);
       generateProblem();
     }
@@ -220,32 +336,41 @@ export const MathGames = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <button 
-                  onClick={() => startGame('compare')}
-                  className="p-6 bg-blue-50 hover:bg-blue-100 rounded-2xl border-2 border-blue-100 transition-all group text-left"
-                >
-                  <ArrowLeftRight className="w-8 h-8 text-blue-500 mb-3 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-bold text-gray-800">So Sánh Nhanh</h3>
-                  <p className="text-xs text-gray-500">Tìm số lớn hơn hoặc nhỏ hơn</p>
-                </button>
-
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <button 
                   onClick={() => startGame('speed')}
                   className="p-6 bg-green-50 hover:bg-green-100 rounded-2xl border-2 border-green-100 transition-all group text-left"
                 >
                   <Zap className="w-8 h-8 text-green-500 mb-3 group-hover:scale-110 transition-transform" />
                   <h3 className="font-bold text-gray-800">Toán Tốc Độ</h3>
-                  <p className="text-xs text-gray-500">Giải toán siêu nhanh trong 30s</p>
+                  <p className="text-xs text-gray-500">Giải toán siêu nhanh trong thời gian giới hạn</p>
                 </button>
 
                 <button 
-                  onClick={() => startGame('missing')}
+                  onClick={() => startGame('thinking')}
+                  className="p-6 bg-blue-50 hover:bg-blue-100 rounded-2xl border-2 border-blue-100 transition-all group text-left"
+                >
+                  <Brain className="w-8 h-8 text-blue-500 mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800">Tư Duy Nhanh</h3>
+                  <p className="text-xs text-gray-500">So sánh và tìm số còn thiếu</p>
+                </button>
+
+                <button 
+                  onClick={() => startGame('word_problems')}
                   className="p-6 bg-purple-50 hover:bg-purple-100 rounded-2xl border-2 border-purple-100 transition-all group text-left"
                 >
-                  <Hash className="w-8 h-8 text-purple-500 mb-3 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-bold text-gray-800">Số Còn Thiếu</h3>
-                  <p className="text-xs text-gray-500">Điền số còn thiếu vào phép tính</p>
+                  <Calculator className="w-8 h-8 text-purple-500 mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800">Giải Toán Giải</h3>
+                  <p className="text-xs text-gray-500">Đọc lời văn và tìm đáp án đúng</p>
+                </button>
+
+                <button 
+                  onClick={() => startGame('logic_math')}
+                  className="p-6 bg-orange-50 hover:bg-orange-100 rounded-2xl border-2 border-orange-100 transition-all group text-left"
+                >
+                  <Star className="w-8 h-8 text-orange-500 mb-3 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-bold text-gray-800">Toán Logic</h3>
+                  <p className="text-xs text-gray-500">Quy luật số và tư duy logic</p>
                 </button>
               </div>
 
@@ -272,7 +397,7 @@ export const MathGames = () => {
                   ))}
                 </div>
                 <p className="text-[10px] text-gray-400 mt-4 text-center">
-                  * Độ khó ảnh hưởng đến phạm vi số và các phép tính (Dễ: 1-10, Vừa: 1-20, Khó: 1-100)
+                  * Độ khó ảnh hưởng đến thời gian, phạm vi số và phép tính (Dễ: 45s/1-10, Vừa: 30s/1-30, Khó: 60s/1-100)
                 </p>
               </div>
             </div>
@@ -350,7 +475,19 @@ export const MathGames = () => {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm">
+            <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm relative">
+              <AnimatePresence>
+                {adaptiveMessage && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    className="absolute -top-10 inset-x-0 mx-auto w-fit bg-math-accent text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg z-50 pointer-events-none"
+                  >
+                    {adaptiveMessage}
+                  </motion.div>
+                )}
+              </AnimatePresence>
               <button 
                 onClick={() => setGameState('idle')}
                 className="text-gray-400 hover:text-gray-600 font-medium flex items-center gap-1"
@@ -377,11 +514,11 @@ export const MathGames = () => {
 
             <div className="bg-white p-6 sm:p-10 rounded-3xl shadow-xl text-center border-4 border-math-primary/10">
               <div className="mb-12">
-                <p className="text-gray-400 font-bold mb-4 uppercase tracking-widest text-xs">
-                  Hãy giải phép tính này
+                <p className="text-gray-500 font-black mb-4 uppercase tracking-[0.2em] text-xs">
+                  HÃY GIẢI PHÉP TÍNH NÀY
                 </p>
                 
-                <div className="text-4xl sm:text-6xl font-display text-gray-800 min-h-[120px] flex items-center justify-center">
+                <div className="text-4xl sm:text-7xl font-display text-gray-900 min-h-[140px] flex items-center justify-center drop-shadow-sm font-black">
                   {currentProblem.question}
                 </div>
               </div>
@@ -393,8 +530,8 @@ export const MathGames = () => {
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleAnswer(opt)}
                     className={cn(
-                      "py-6 bg-gray-50 hover:bg-math-primary hover:text-white rounded-2xl text-2xl sm:text-3xl font-bold text-gray-700 transition-all border-2 border-gray-100",
-                      typeof opt === 'string' && opt.length > 5 ? "text-lg sm:text-xl" : ""
+                      "py-6 bg-white hover:bg-math-primary hover:text-white rounded-[32px] text-3xl sm:text-5xl font-display font-black text-gray-900 transition-all border-4 border-gray-100 shadow-md hover:shadow-xl active:scale-95",
+                      typeof opt === 'string' && opt.length > 5 ? "text-xl sm:text-2xl" : ""
                     )}
                   >
                     {opt}

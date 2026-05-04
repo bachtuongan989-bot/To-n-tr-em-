@@ -12,10 +12,22 @@ function cn(...inputs: ClassValue[]) {
 type Mode = 'learn' | 'quiz' | 'matrix';
 type TableType = 'multiplication' | 'division';
 
-export const MultiplicationTable = () => {
+interface MultiplicationTableProps {
+  age?: number;
+}
+
+export const MultiplicationTable: React.FC<MultiplicationTableProps> = ({ age = 7 }) => {
   const [mode, setMode] = useState<Mode>('learn');
   const [tableType, setTableType] = useState<TableType>('multiplication');
   const [selectedNum, setSelectedNum] = useState<number>(2);
+
+  useEffect(() => {
+    // Select appropriate table based on age
+    if (age <= 7) setSelectedNum(2);
+    else if (age === 8) setSelectedNum(5);
+    else if (age === 9) setSelectedNum(8);
+    else if (age >= 10) setSelectedNum(9);
+  }, [age]);
   const [userAnswers, setUserAnswers] = useState<Record<number, string>>({});
   const [isComplete, setIsComplete] = useState(false);
   const [hoveredCell, setHoveredCell] = useState<{r: number, c: number} | null>(null);
@@ -36,10 +48,13 @@ export const MultiplicationTable = () => {
     if (mode === 'learn') {
       setUserAnswers({});
       setIsComplete(false);
+    } else if (mode === 'quiz') {
+      setQuizType('random');
+      startNewQuiz();
     } else {
       startNewQuiz();
     }
-  }, [selectedNum, mode, quizType]);
+  }, [selectedNum, mode]);
 
   const startNewQuiz = () => {
     setQuizScore(0);
@@ -184,35 +199,35 @@ export const MultiplicationTable = () => {
             <button
               onClick={() => setTableType('multiplication')}
               className={cn(
-                "px-6 py-2 rounded-xl font-bold transition-all",
-                tableType === 'multiplication' ? "bg-math-primary text-white" : "bg-gray-100 text-gray-500"
+                "px-8 py-3 rounded-2xl font-black transition-all border-4 shadow-sm",
+                tableType === 'multiplication' ? "bg-math-primary border-math-primary text-white shadow-lg" : "bg-white border-gray-100 text-gray-400"
               )}
             >
-              Bảng Nhân
+              BẢNG NHÂN
             </button>
             <button
               onClick={() => setTableType('division')}
               className={cn(
-                "px-6 py-2 rounded-xl font-bold transition-all",
-                tableType === 'division' ? "bg-math-primary text-white" : "bg-gray-100 text-gray-500"
+                "px-8 py-3 rounded-2xl font-black transition-all border-4 shadow-sm",
+                tableType === 'division' ? "bg-math-primary border-math-primary text-white shadow-lg" : "bg-white border-gray-100 text-gray-400"
               )}
             >
-              Bảng Chia
+              BẢNG CHIA
             </button>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
             {numbers.map((num) => (
               <motion.button
                 key={num}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setSelectedNum(num)}
                 className={cn(
-                  "w-12 h-12 sm:w-14 sm:h-14 rounded-2xl font-display text-xl sm:text-2xl transition-all flex items-center justify-center",
+                  "w-14 h-14 sm:w-16 sm:h-16 rounded-3xl font-display text-2xl sm:text-3xl transition-all flex items-center justify-center border-4 shadow-sm",
                   selectedNum === num 
-                    ? 'bg-math-primary text-white shadow-lg ring-4 ring-math-primary/20' 
-                    : 'bg-white text-math-primary border-2 border-math-primary/20 hover:border-math-primary'
+                    ? 'bg-math-primary border-math-primary text-white shadow-xl scale-110 z-10' 
+                    : 'bg-white border-gray-100 text-math-primary hover:border-math-primary/30'
                 )}
               >
                 {num}
@@ -476,27 +491,11 @@ export const MultiplicationTable = () => {
             </motion.div>
           ) : (
             <>
-              <div className="mb-8">
-                <h3 className="font-display text-3xl text-math-secondary mb-4">Đố Vui Cửu Chương</h3>
-                <div className="flex justify-center gap-4 mb-6">
-                  <button
-                    onClick={() => setQuizType('random')}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-sm font-bold transition-all",
-                      quizType === 'random' ? "bg-math-secondary text-white" : "bg-gray-100 text-gray-500"
-                    )}
-                  >
-                    Ngẫu nhiên
-                  </button>
-                  <button
-                    onClick={() => setQuizType('specific')}
-                    className={cn(
-                      "px-4 py-2 rounded-xl text-sm font-bold transition-all",
-                      quizType === 'specific' ? "bg-math-secondary text-white" : "bg-gray-100 text-gray-500"
-                    )}
-                  >
-                    Chỉ bảng {selectedNum}
-                  </button>
+              <div className="mb-12">
+                <h3 className="font-display text-4xl text-math-secondary mb-6 font-black drop-shadow-sm">Thử Thách Random</h3>
+                <div className="flex justify-center gap-12 text-sm font-black text-gray-400 uppercase tracking-[0.2em]">
+                  <span className="flex items-center gap-2"><CheckCircle2 className="w-5 h-5 text-green-500" /> Đúng: {quizScore}</span>
+                  <span className="flex items-center gap-2"><XCircle className="w-5 h-5 text-red-500" /> Câu hỏi: {quizCount}/10</span>
                 </div>
               </div>
 
