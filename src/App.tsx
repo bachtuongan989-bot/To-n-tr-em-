@@ -24,6 +24,7 @@ import {
   Award,
   ClipboardList
 } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 import { mathService, MATH_TOPICS } from './services/mathService';
 import { RewardService, Achievement } from './services/rewardService';
 import { MultiplicationTable } from './components/MultiplicationTable';
@@ -462,6 +463,7 @@ export default function App() {
       </AnimatePresence>
 
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+      <Analytics />
     </div>
   );
 }
