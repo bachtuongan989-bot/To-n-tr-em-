@@ -39,6 +39,7 @@ import { SettingsModal } from './components/SettingsModal';
 import { SettingsService } from './services/settingsService';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -462,6 +463,7 @@ export default function App() {
       </AnimatePresence>
 
       <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
+      <SpeedInsights />
     </div>
   );
 }
