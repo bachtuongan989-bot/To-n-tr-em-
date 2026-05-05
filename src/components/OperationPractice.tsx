@@ -99,8 +99,8 @@ export const OperationPractice: React.FC<OperationPracticeProps> = ({ age = 7 })
     const maxB = Math.pow(10, bDigits) - 1;
 
     // Decide if it should be a 3-number operation (A ± B ± C)
-    // Only if 'both' is selected or for higher grades
-    const isThreeNumbers = (opType === 'both' && grade >= 2 && Math.random() > 0.5) || (grade >= 4 && Math.random() > 0.4);
+    // Only for older grades (grade 4+ which is age 9+)
+    const isThreeNumbers = grade >= 4 && opType === 'both' && Math.random() > 0.4;
 
     let hint = "";
     if (isThreeNumbers) {

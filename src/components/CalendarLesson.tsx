@@ -21,6 +21,11 @@ const LESSON_STEPS = [
     interactive: 'full_calendar'
   },
   {
+    title: 'Cùng làm quen với Lịch Âm!',
+    content: 'Trên tờ lịch thường có hai loại ngày: ngày Dương lịch để tính lịch đi học, đi làm, và ngày Âm lịch để xem ngày lễ Tết truyền thống (như Tết Trung Thu, Tết Nguyên Đán).',
+    interactive: 'lunar'
+  },
+  {
     title: 'Thực hành xem lịch',
     content: 'Bé hãy đọc kỹ câu hỏi và tính nhẩm rồi chọn đáp án hoặc nhấn vào ngày đúng trên lịch nhé!',
     interactive: 'practice'
@@ -354,6 +359,36 @@ export const CalendarLesson: React.FC = () => {
                     </div>
                   </div>
                 )}
+              </motion.div>
+            )}
+
+            {LESSON_STEPS[currentStep].interactive === 'lunar' && (
+              <motion.div
+                key="lunar"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="max-w-2xl mx-auto flex flex-col md:flex-row gap-8 items-center justify-center p-6 bg-orange-50 rounded-3xl border-2 border-orange-200"
+              >
+                <div className="w-48 h-56 bg-white rounded-2xl shadow-xl border-t-8 border-red-500 flex flex-col items-center justify-start p-4 relative shrink-0">
+                  <div className="text-gray-500 font-bold mb-2">Tháng 8</div>
+                  <div className="text-6xl font-black text-gray-800 mb-4">15</div>
+                  <div className="text-gray-400 font-medium text-sm">Thứ Hai</div>
+                  <div className="absolute bottom-4 right-4 text-orange-500 font-bold flex flex-col items-end">
+                    <span className="text-xs">Âm lịch</span>
+                    <span className="text-2xl">1</span>
+                  </div>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div className="bg-white p-4 rounded-xl shadow-sm border border-orange-100">
+                    <p className="font-bold text-gray-800 mb-1 text-lg">Dương lịch (Số lớn)</p>
+                    <p className="text-gray-600 text-sm">Dùng để xem ngày đi học, đi làm và các thứ trong tuần.</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl shadow-sm border border-orange-100 border-l-4 border-l-orange-500">
+                    <p className="font-bold text-orange-600 mb-1 text-lg">Âm lịch (Số nhỏ nhắn)</p>
+                    <p className="text-gray-600 text-sm">Thời xưa ông cha ta dùng Lịch Âm theo Mặt Trăng. Lịch Âm dùng để tính các dịp lễ Tết, Rằm... nằm ở góc dưới bên phải đó bé!</p>
+                  </div>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

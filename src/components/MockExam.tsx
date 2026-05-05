@@ -180,35 +180,115 @@ export const MockExam: React.FC<MockExamProps> = ({ age }) => {
     const percentage = (score / totalPoints) * 100;
 
     return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="max-w-2xl mx-auto bg-white rounded-[40px] p-10 border-4 border-math-primary shadow-2xl text-center space-y-8"
-      >
-        <Trophy className="w-24 h-24 text-yellow-500 mx-auto" />
-        <div className="space-y-2">
-          <h2 className="font-display text-4xl text-gray-800">Kết Quả</h2>
-          <p className="text-gray-400">{selectedExam.title}</p>
+      <div className="max-w-4xl mx-auto space-y-8 pb-20">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-[40px] p-10 border-4 border-math-primary shadow-2xl text-center space-y-6"
+        >
+          <Trophy className="w-24 h-24 text-yellow-500 mx-auto" />
+          <div className="space-y-2">
+            <h2 className="font-display text-4xl text-gray-800">Kết Quả</h2>
+            <p className="text-gray-400">{selectedExam.title}</p>
+          </div>
+          <div className="flex justify-center items-end gap-2">
+            <span className="text-7xl font-black text-math-primary">{score}</span>
+            <span className="text-2xl font-bold text-gray-300 mb-2">/ {totalPoints} Điểm</span>
+          </div>
+          <div className="flex gap-4 pt-4 max-w-sm mx-auto">
+            <button 
+              onClick={() => setSelectedExam(null)}
+              className="flex-1 py-4 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200 transition-all font-display"
+            >
+              Chọn Đề Khác
+            </button>
+            <button 
+              onClick={() => startExam(selectedExam)}
+              className="flex-1 py-4 bg-math-primary text-white font-bold rounded-2xl shadow-lg hover:brightness-110 transition-all font-display"
+            >
+              Làm Lại
+            </button>
+          </div>
+        </motion.div>
+
+        <div className="space-y-6">
+          <h3 className="font-display text-2xl text-gray-800 text-center">Xem Lại Bài Làm</h3>
+          {selectedExam.questions.map((q, idx) => {
+            const userAnswer = userAnswers[q.id]?.toLowerCase().trim();
+            const correct = q.correctAnswer.toLowerCase().trim();
+            const isCorrect = userAnswer === correct;
+
+            return (
+              <div key={q.id} className={cn(
+                "p-6 rounded-3xl border-2 space-y-4",
+                isCorrect ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+              )}>
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center font-black shrink-0 text-white text-lg",
+                    isCorrect ? "bg-green-500" : "bg-red-500"
+                  )}>
+                    {idx + 1}
+                  </div>
+                  <div className="flex-1 space-y-4">
+                    <h4 className="text-lg font-bold text-gray-800">{q.text}</h4>
+                    
+                    {q.type === 'multiple-choice' && q.options && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                        {q.options.map(opt => {
+                          let optBg = "bg-white border-gray-100 text-gray-500";
+                          if (opt.value.toLowerCase() === correct) {
+                            optBg = "bg-green-500 border-green-500 text-white";
+                          } else if (opt.value.toLowerCase() === userAnswer && !isCorrect) {
+                            optBg = "bg-red-500 border-red-500 text-white";
+                          }
+                          return (
+                            <div key={opt.value} className={cn("p-3 rounded-xl border-2 flex gap-3 font-bold", optBg)}>
+                              <span>{opt.value}.</span> <span>{opt.label}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <div className="space-y-2 bg-white/50 p-4 rounded-2xl">
+                      <p className="text-base">
+                        <span className="text-gray-500 font-medium">Bạn đã làm: </span>
+                        <span className={cn("font-bold text-lg", isCorrect ? "text-green-600" : "text-red-600")}>
+                          {userAnswers[q.id] || "Chưa làm"}
+                        </span>
+                      </p>
+                      
+                      {!isCorrect && (
+                        <p className="text-base">
+                          <span className="text-gray-500 font-medium">Đáp án đúng: </span>
+                          <span className="text-green-600 font-bold text-lg">{q.correctAnswer}</span>
+                        </p>
+                      )}
+
+                      {!isCorrect && q.explanation && (
+                        <div className="mt-4 p-4 bg-white rounded-xl text-sm text-gray-700 shadow-sm border border-gray-100">
+                          <div className="font-bold text-orange-500 mb-1 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" /> Giải thích:
+                          </div>
+                          <div className="leading-relaxed">{q.explanation}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="shrink-0 mt-2 sm:mt-0">
+                     {isCorrect ? (
+                       <CheckCircle2 className="w-8 h-8 text-green-500" />
+                     ) : (
+                       <XCircle className="w-8 h-8 text-red-500" />
+                     )}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div className="flex justify-center items-end gap-2">
-          <span className="text-7xl font-black text-math-primary">{score}</span>
-          <span className="text-2xl font-bold text-gray-300 mb-2">/ {totalPoints} Pts</span>
-        </div>
-        <div className="flex gap-4 pt-4">
-          <button 
-            onClick={() => setSelectedExam(null)}
-            className="flex-1 py-4 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200"
-          >
-            Quay Lại
-          </button>
-          <button 
-            onClick={() => startExam(selectedExam)}
-            className="flex-1 py-4 bg-math-primary text-white font-bold rounded-2xl shadow-lg hover:brightness-110"
-          >
-            Làm Lại
-          </button>
-        </div>
-      </motion.div>
+      </div>
     );
   }
 

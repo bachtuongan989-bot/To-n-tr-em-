@@ -4,9 +4,11 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export const MATH_TOPICS = [
   { id: 'general', name: 'Tổng hợp', icon: '📚' },
-  { id: 'fractions', name: 'Phân số', icon: '🍰' },
-  { id: 'decimals', name: 'Số thập phân', icon: '🔢' },
-  { id: 'geometry', name: 'Hình học tiểu học', icon: '📦' },
+  { id: 'missing_number', name: 'Tìm số còn thiếu', icon: '🔍' },
+  { id: 'advanced_ops', name: 'Nhân chia nâng cao', icon: '⚡', minAge: 8 },
+  { id: 'fractions', name: 'Phân số', icon: '🍰', minAge: 9 },
+  { id: 'decimals', name: 'Số thập phân', icon: '🔢', minAge: 10 },
+  { id: 'geometry', name: 'Hình học', icon: '📦' },
   { id: 'word_problems', name: 'Giải toán có lời văn', icon: '📝' },
 ];
 

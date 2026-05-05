@@ -265,7 +265,7 @@ export default function App() {
               <div className="text-center space-y-4 mb-8">
                 <h2 className="font-display text-3xl md:text-5xl text-gray-800">Thử Thách Luyện Tập</h2>
                 <div className="flex flex-wrap justify-center gap-2 mt-6 max-w-4xl mx-auto">
-                  {MATH_TOPICS.map(topic => (
+                  {MATH_TOPICS.filter(t => (!t.minAge || age >= t.minAge) && (!t.maxAge || age <= t.maxAge)).map(topic => (
                     <button
                       key={topic.id}
                       onClick={() => setSelectedTopic(topic.id)}
